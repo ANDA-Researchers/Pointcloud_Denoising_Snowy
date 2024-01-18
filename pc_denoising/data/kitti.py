@@ -28,8 +28,9 @@ class KITTI(Dataset):
     ) -> Tuple[npt.NDArray[np.int64], npt.NDArray[np.float32], npt.NDArray[np.int64]]:
         lidar = _load_lidar(self._lidar_paths[idx])
         voxel_coords, voxel_indices, point_counts = self._partition_voxels(lidar[:, :3])
+        num_voxels = len(voxel_coords)
         sampled_points = self._sample_points(
-            lidar, voxel_coords, voxel_indices, point_counts
+            lidar, num_voxels, voxel_indices, point_counts
         )
         voxel_features = sampled_points[:, :, :4]
         voxel_labels = sampled_points[:, :, 4]
@@ -46,11 +47,10 @@ class KITTI(Dataset):
     def _sample_points(
         self,
         lidar: npt.NDArray[np.float32],
-        voxel_coords: npt.NDArray[np.int64],
+        num_voxels: int,
         voxel_indices: npt.NDArray[np.int64],
         point_counts: npt.NDArray[np.int64],
     ) -> npt.NDArray[np.float32]:
-        num_voxels = len(voxel_coords)
         sampled_points = np.zeros(
             (num_voxels, self._num_points_per_voxel, 5), dtype=np.float32
         )

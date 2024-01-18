@@ -7,10 +7,15 @@ import numpy.typing as npt
 from torch.utils.data import Dataset
 
 
+X_RANGE, Y_RANGE, Z_RANGE = (0.0, 70.4), (-40.0, 40.0), (-3.0, 1.0)
+VD, VW, VH = 0.4, 0.2, 0.2
+T = 35
+
+
 class KITTI(Dataset):
-    _lidar_range = np.array([[0.0, 70.4], [-40.0, 40.0], [-3.0, 1.0]], dtype=np.float32)
-    _voxel_size = np.array([0.2, 0.2, 0.4], dtype=np.float32)
-    _num_points_per_voxel = 35
+    _lidar_range = np.array([X_RANGE, Y_RANGE, Z_RANGE], dtype=np.float32)
+    _voxel_size = np.array(VD, VW, VH, dtype=np.float32)
+    _num_points_per_voxel = T
 
     def __init__(self, lidar_paths: Sequence[Path]) -> None:
         self._lidar_paths = lidar_paths

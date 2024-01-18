@@ -37,10 +37,12 @@ def ah_clustering_dense(pcl):
     label = pcl[:, 4]
   
     # Get points labeled as "noise"                                      
-    nx, ny, nz = pcl[(label == 1), :3].T 
+    # nx, ny, nz = pcl[(label == 1), :3].T 
+    nx, ny, nz, nr = pcl[(label == 1), :4].T 
     
     # noise_points = np.array([nx]).T
-    noise_points = np.array([nx, ny, nz]).T
+    # noise_points = np.array([nx, ny, nz]).T
+    noise_points = np.array([nx, ny, nz, nr]).T
 
     # Iterative parameter
     num_points = len(noise_points) 

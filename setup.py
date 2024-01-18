@@ -1,0 +1,12 @@
+from setuptools import setup
+
+
+setup(
+    name="pc_denoising",
+    version="0.0.1",
+    install_requires=[
+        "numpy==1.24.4",
+        "torch==2.1.2",
+        "torchvision==0.16.2",
+    ],
+)

@@ -1,7 +1,8 @@
 # Python
 __pycache__/
+.venv/
 *.ipynb
-*.venv/
+*.egg-info/
 
 # Dataset
 *.bin

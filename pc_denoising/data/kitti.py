@@ -14,7 +14,7 @@ T = 35
 
 class KITTI(Dataset):
     _lidar_range = np.array([X_RANGE, Y_RANGE, Z_RANGE], dtype=np.float32)
-    _voxel_size = np.array(VD, VW, VH, dtype=np.float32)
+    _voxel_size = np.array([VD, VW, VH], dtype=np.float32)
     _num_points_per_voxel = T
 
     def __init__(self, lidar_paths: Sequence[Path]) -> None:

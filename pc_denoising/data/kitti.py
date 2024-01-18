@@ -23,7 +23,9 @@ class KITTI(Dataset):
     def __len__(self) -> int:
         return len(self._lidar_paths)
 
-    def __getitem__(self, idx: int):
+    def __getitem__(
+        self, idx: int
+    ) -> Tuple[npt.NDArray[np.int64], npt.NDArray[np.float32], npt.NDArray[np.int64]]:
         lidar = _load_lidar(self._lidar_paths[idx])
         voxel_coords, voxel_indices, point_counts = self._partition_voxels(lidar[:, :3])
         sampled_points = self._sample_points(

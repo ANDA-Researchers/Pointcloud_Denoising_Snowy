@@ -1,7 +1,6 @@
-import pickle
 import random
 from pathlib import Path
-from typing import Tuple
+from typing import Sequence, Tuple
 
 import numpy as np
 import numpy.typing as npt
@@ -13,16 +12,8 @@ class KITTI(Dataset):
     _voxel_size = np.array([0.2, 0.2, 0.4], dtype=np.float32)
     _num_points_per_voxel = 35
 
-    def __init__(
-        self, root_dir: Path, info_path: Path, is_reduced: bool = True
-    ) -> None:
-        super().__init__()
-        infos = pickle.loads(info_path.read_bytes())
-        lidar_dir_name = "velodyne_reduced" if is_reduced else "velodyne"
-        self._lidar_paths = [
-            root_dir / info["velodyne_path"].replace("velodyne", lidar_dir_name)
-            for info in infos
-        ]
+    def __init__(self, lidar_paths: Sequence[Path]) -> None:
+        self._lidar_paths = lidar_paths
 
     def __len__(self) -> int:
         return len(self._lidar_paths)
@@ -30,11 +21,13 @@ class KITTI(Dataset):
     def __getitem__(self, idx: int):
         lidar = _load_lidar(self._lidar_paths[idx])
         voxel_coords, voxel_indices, point_counts = self._partition_voxels(lidar[:, :3])
-        voxel_features = self._sample_features(
+        sampled_points = self._sample_points(
             lidar, voxel_coords, voxel_indices, point_counts
         )
+        voxel_features = sampled_points[:, :, :4]
+        voxel_labels = sampled_points[:, :, 4]
         voxel_features = _augment_features(voxel_features)
-        return voxel_coords, voxel_features
+        return voxel_coords, voxel_features, voxel_labels
 
     def _partition_voxels(
         self, voxel_coords: npt.NDArray[np.float32]
@@ -43,7 +36,7 @@ class KITTI(Dataset):
         voxel_coords = voxel_coords[:, [2, 0, 1]].astype(np.int64)
         return np.unique(voxel_coords, return_inverse=True, return_counts=True, axis=0)
 
-    def _sample_features(
+    def _sample_points(
         self,
         lidar: npt.NDArray[np.float32],
         voxel_coords: npt.NDArray[np.int64],
@@ -51,20 +44,20 @@ class KITTI(Dataset):
         point_counts: npt.NDArray[np.int64],
     ) -> npt.NDArray[np.float32]:
         num_voxels = len(voxel_coords)
-        voxel_features = np.zeros(
-            (num_voxels, self._num_points_per_voxel, 4), dtype=np.float32
+        sampled_points = np.zeros(
+            (num_voxels, self._num_points_per_voxel, 5), dtype=np.float32
         )
         for idx, point_count in enumerate(point_counts):
             points_in_voxel = lidar[voxel_indices == idx]
             num_sampled_points = min(self._num_points_per_voxel, point_count)
-            voxel_features[idx, :num_sampled_points] = random.sample(
+            sampled_points[idx, :num_sampled_points] = random.sample(
                 points_in_voxel.tolist(), num_sampled_points
             )
-        return voxel_features
+        return sampled_points
 
 
 def _load_lidar(lidar_path: Path) -> npt.NDArray[np.float32]:
-    return np.fromfile(lidar_path, dtype=np.float32).reshape(-1, 4)
+    return np.fromfile(lidar_path, dtype=np.float32).reshape(-1, 5)
 
 
 def _augment_features(

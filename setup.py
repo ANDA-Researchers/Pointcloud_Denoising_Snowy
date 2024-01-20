@@ -4,8 +4,10 @@ from setuptools import setup
 setup(
     name="pc_denoising",
     version="0.0.1",
+    packages=["pc_denoising"],
     install_requires=[
         "ipykernel==6.29.0",
+        "matplotlib==3.7.4",
         "numpy==1.24.4",
         "torch==2.1.2",
         "torchvision==0.16.2",

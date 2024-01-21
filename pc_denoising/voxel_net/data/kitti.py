@@ -7,19 +7,20 @@ import cv2
 import numpy as np
 import torch.utils.data as data
 
+import pc_denoising.voxel_net.config as cfg
 from pc_denoising.voxel_net import utils
 from pc_denoising.voxel_net.data_aug import aug_data
 
 
 class KittiDataset(data.Dataset):
-    def __init__(self, cfg, root="./KITTI", set="train", type="velodyne_train"):
+    def __init__(
+        self, lidar_path, image_path, calib_path, label_path, type="velodyne_train"
+    ):
         self.type = type
-        self.root = root
-        self.data_path = os.path.join(root, "training")
-        self.lidar_path = os.path.join(self.data_path, "crop/")
-        self.image_path = os.path.join(self.data_path, "image_2/")
-        self.calib_path = os.path.join(self.data_path, "calib/")
-        self.label_path = os.path.join(self.data_path, "label_2/")
+        self.lidar_path = lidar_path
+        self.image_path = image_path
+        self.calib_path = calib_path
+        self.label_path = label_path
 
         with open(os.path.join(self.data_path, "%s.txt" % set)) as f:
             self.file_list = f.read().splitlines()
@@ -78,31 +79,25 @@ class KittiDataset(data.Dataset):
         gt_box3d = utils.load_kitti_label(label_file, Tr)
         lidar = np.fromfile(lidar_file, dtype=np.float32).reshape(-1, 4)
 
-        if self.type == "velodyne_train":
-            image = cv2.imread(image_file)
+        image = cv2.imread(image_file)
 
-            # data augmentation
+        # data augmentation
+        if self.type == "velodyne_train":
             lidar, gt_box3d = aug_data(lidar, gt_box3d)
 
-            # specify a range
-            lidar, gt_box3d = utils.get_filtered_lidar(lidar, gt_box3d)
+        # specify a range
+        lidar, gt_box3d = utils.get_filtered_lidar(lidar, gt_box3d)
 
-            # voxelize
-            voxel_features, voxel_coords = self.preprocess(lidar)
+        # voxelize
+        voxel_features, voxel_coords = self.preprocess(lidar)
 
-            return (
-                voxel_features,
-                voxel_coords,
-                image,
-                calib,
-                self.file_list[i],
-            )
-
-        elif self.type == "velodyne_test":
-            NotImplemented
-
-        else:
-            raise ValueError("the type invalid")
+        return (
+            voxel_features,
+            voxel_coords,
+            image,
+            calib,
+            self.file_list[i],
+        )
 
     def __len__(self):
         return len(self.file_list)

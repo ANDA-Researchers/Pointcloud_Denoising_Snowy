@@ -18,7 +18,8 @@ class KittiDataset(data.Dataset):
     ) -> None:
         self.lidar_files = lidar_files
         self.calib_files = calib_files
-        self.label_files = label_files
+        if type == "velodyne_train":
+            self.label_files = label_files
 
         self.type = type
 
@@ -42,7 +43,7 @@ class KittiDataset(data.Dataset):
         voxel_coords = (
             (lidar[:, :3] - np.array([self.xrange[0], self.yrange[0], self.zrange[0]]))
             / (self.vw, self.vh, self.vd)
-        ).astype(np.int32)
+        ).astype(np.int64)
 
         # convert to  (D, H, W)
         voxel_coords = voxel_coords[:, [2, 1, 0]]
@@ -51,31 +52,35 @@ class KittiDataset(data.Dataset):
         )
 
         voxel_features = []
+        voxel_labels = []
 
         for i in range(len(voxel_coords)):
-            voxel = np.zeros((self.T, 7), dtype=np.float32)
+            features = np.zeros((self.T, 7), dtype=np.float32)
+            labels = np.zeros((self.T), dtype=np.int64)
             pts = lidar[inv_ind == i]
             if voxel_counts[i] > self.T:
                 pts = pts[: self.T, :]
                 voxel_counts[i] = self.T
             # augment the points
-            voxel[: pts.shape[0], :] = np.concatenate(
-                (pts, pts[:, :3] - np.mean(pts[:, :3], 0)), axis=1
+            features[: pts.shape[0], :] = np.concatenate(
+                (pts[:, :3], pts[:, 3:4], pts[:, :3] - np.mean(pts[:, :3], 0)), axis=1
             )
-            voxel_features.append(voxel)
-        return np.array(voxel_features), voxel_coords
+            labels[: pts.shape[0]] = pts[:, 4]
+            voxel_features.append(features)
+            voxel_labels.append(labels)
+        return voxel_coords, np.array(voxel_features), np.array(voxel_labels)
 
     def __getitem__(self, i):
         lidar_file = self.lidar_files[i]
         calib_file = self.calib_files[i]
-        label_file = self.label_files[i]
 
         calib = utils.load_kitti_calib(calib_file)
-        Tr = calib["Tr_velo2cam"]
-        gt_box3d = utils.load_kitti_label(label_file, Tr)
-        lidar = np.fromfile(lidar_file, dtype=np.float32).reshape(-1, 5)[:, :4]
+        lidar = np.fromfile(lidar_file, dtype=np.float32).reshape(-1, 5)
 
         if self.type == "velodyne_train":
+            label_file = self.label_files[i]
+            Tr = calib["Tr_velo2cam"]
+            gt_box3d = utils.load_kitti_label(label_file, Tr)
             # data augmentation
             lidar, gt_box3d = aug_data(lidar, gt_box3d)
         elif self.type == "velodyne_test":
@@ -87,9 +92,7 @@ class KittiDataset(data.Dataset):
         lidar, gt_box3d = utils.get_filtered_lidar(lidar, gt_box3d)
 
         # voxelize
-        voxel_features, voxel_coords = self.preprocess(lidar)
-
-        return voxel_coords, voxel_features
+        return self.preprocess(lidar)
 
     def __len__(self):
         return len(self.lidar_files)

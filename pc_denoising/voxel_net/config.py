@@ -1,16 +1,16 @@
 import math
 import numpy as np
 
-class config:
 
+class config:
     # classes
-    class_list = ['Car', 'Van']
+    class_list = ["Car", "Van"]
 
     # batch size
-    N=2
+    N = 2
 
     # maxiumum number of points per voxel
-    T=35
+    T = 35
 
     # voxel size
     vd = 0.4
@@ -32,8 +32,8 @@ class config:
     neg_threshold = 0.45
 
     #   anchors: (200, 176, 2, 7) x y z h w l r
-    x = np.linspace(xrange[0]+vw, xrange[1]-vw, W/2)
-    y = np.linspace(yrange[0]+vh, yrange[1]-vh, H/2)
+    x = np.linspace(xrange[0] + vw, xrange[1] - vw, W // 2)
+    y = np.linspace(yrange[0] + vh, yrange[1] - vh, H // 2)
     cx, cy = np.meshgrid(x, y)
     # all is (w, l, 2)
     cx = np.tile(cx[..., np.newaxis], 2)
@@ -44,7 +44,7 @@ class config:
     h = np.ones_like(cx) * 1.56
     r = np.ones_like(cx)
     r[..., 0] = 0
-    r[..., 1] = np.pi/2
+    r[..., 1] = np.pi / 2
     anchors = np.stack([cx, cy, cz, h, w, l, r], axis=-1)
 
     anchors_per_position = 2

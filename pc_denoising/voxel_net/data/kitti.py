@@ -1,9 +1,5 @@
 from __future__ import division
 
-import os
-import os.path
-
-import cv2
 import numpy as np
 import torch.utils.data as data
 
@@ -13,16 +9,18 @@ from pc_denoising.voxel_net.data_aug import aug_data
 
 
 class KittiDataset(data.Dataset):
-    def __init__(self, root, file_list, type="velodyne_train") -> None:
-        self.type = type
-        self.root = root
-        self.data_path = os.path.join(root, "training")
-        self.lidar_path = os.path.join(self.data_path, "crop/")
-        self.image_path = os.path.join(self.data_path, "image_2/")
-        self.calib_path = os.path.join(self.data_path, "calib/")
-        self.label_path = os.path.join(self.data_path, "label_2/")
+    def __init__(
+        self,
+        lidar_files,
+        calib_files,
+        label_files,
+        type="velodyne_train",
+    ) -> None:
+        self.lidar_files = lidar_files
+        self.calib_files = calib_files
+        self.label_files = label_files
 
-        self.file_list = file_list
+        self.type = type
 
         self.T = cfg.T
         self.vd = cfg.vd
@@ -68,17 +66,14 @@ class KittiDataset(data.Dataset):
         return np.array(voxel_features), voxel_coords
 
     def __getitem__(self, i):
-        lidar_file = self.lidar_path + "/" + self.file_list[i] + ".bin"
-        calib_file = self.calib_path + "/" + self.file_list[i] + ".txt"
-        label_file = self.label_path + "/" + self.file_list[i] + ".txt"
-        image_file = self.image_path + "/" + self.file_list[i] + ".png"
+        lidar_file = self.lidar_files[i]
+        calib_file = self.calib_files[i]
+        label_file = self.label_files[i]
 
         calib = utils.load_kitti_calib(calib_file)
         Tr = calib["Tr_velo2cam"]
         gt_box3d = utils.load_kitti_label(label_file, Tr)
-        lidar = np.fromfile(lidar_file, dtype=np.float32).reshape(-1, 4)
-
-        image = cv2.imread(image_file)
+        lidar = np.fromfile(lidar_file, dtype=np.float32).reshape(-1, 5)[:, :4]
 
         if self.type == "velodyne_train":
             # data augmentation
@@ -94,13 +89,7 @@ class KittiDataset(data.Dataset):
         # voxelize
         voxel_features, voxel_coords = self.preprocess(lidar)
 
-        return (
-            voxel_features,
-            voxel_coords,
-            image,
-            calib,
-            self.file_list[i],
-        )
+        return voxel_coords, voxel_features
 
     def __len__(self):
-        return len(self.file_list)
+        return len(self.lidar_files)

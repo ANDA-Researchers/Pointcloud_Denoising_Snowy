@@ -90,7 +90,13 @@ class KittiDataset(data.Dataset):
             # voxelize
             voxel_features, voxel_coords = self.preprocess(lidar)
 
-            return voxel_features, voxel_coords
+            return (
+                voxel_features,
+                voxel_coords,
+                image,
+                calib,
+                self.file_list[i],
+            )
 
         elif self.type == "velodyne_test":
             NotImplemented

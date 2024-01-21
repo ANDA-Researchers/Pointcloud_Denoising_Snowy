@@ -7,8 +7,8 @@ import cv2
 import numpy as np
 import torch.utils.data as data
 
-import pc_denoising.voxel_net.config as cfg
 from pc_denoising.voxel_net import utils
+from pc_denoising.voxel_net.config import config as cfg
 from pc_denoising.voxel_net.data_aug import aug_data
 
 

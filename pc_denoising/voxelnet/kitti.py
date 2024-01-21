@@ -3,9 +3,9 @@ from __future__ import division
 import numpy as np
 import torch.utils.data as data
 
-from pc_denoising.voxel_net import utils
-from pc_denoising.voxel_net.config import config as cfg
-from pc_denoising.voxel_net.data_aug import aug_data
+from pc_denoising.voxelnet import utils
+from pc_denoising.voxelnet.config import config as cfg
+from pc_denoising.voxelnet.data_aug import aug_data
 
 
 class KittiDataset(data.Dataset):

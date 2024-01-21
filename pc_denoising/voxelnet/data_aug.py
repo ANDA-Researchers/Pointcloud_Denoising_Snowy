@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 
-from pc_denoising.voxel_net.config import config as cfg
+from pc_denoising.voxelnet.config import config as cfg
 
 
 def draw_polygon(img, box_corner, color=(255, 255, 255), thickness=1):

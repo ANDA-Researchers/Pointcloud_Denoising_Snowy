@@ -6,8 +6,8 @@ import cv2
 import numpy as np
 import mayavi.mlab as mlab
 
-from pc_denoising.voxel_net.config import config as cfg
-from pc_denoising.voxel_net.data_aug import aug_data
+from pc_denoising.voxelnet.config import config as cfg
+from pc_denoising.voxelnet.data_aug import aug_data
 
 
 def get_filtered_lidar(lidar, boxes3d=None):

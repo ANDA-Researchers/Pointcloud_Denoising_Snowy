@@ -38,7 +38,7 @@ class KITTI(Dataset):
         self, voxel_coords: npt.NDArray[np.float32]
     ) -> Tuple[npt.NDArray[np.int64], npt.NDArray[np.int64], npt.NDArray[np.int64]]:
         voxel_coords = (voxel_coords - self._lidar_range[:, 0]) / self._voxel_size
-        voxel_coords = voxel_coords[:, [2, 0, 1]].astype(np.int64)
+        voxel_coords = voxel_coords[:, [2, 1, 0]].astype(np.int64)
         return np.unique(voxel_coords, return_inverse=True, return_counts=True, axis=0)
 
     def _sample_points(

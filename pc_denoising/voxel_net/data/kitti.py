@@ -63,7 +63,7 @@ class KittiDataset(data.Dataset):
                 voxel_counts[i] = self.T
             # augment the points
             features[: pts.shape[0], :] = np.concatenate(
-                (pts[:, :3], pts[:, 3:4], pts[:, :3] - np.mean(pts[:, :3], 0)), axis=1
+                (pts[:, :4], pts[:, :3] - np.mean(pts[:, :3], 0)), axis=1
             )
             labels[: pts.shape[0]] = pts[:, 4]
             voxel_features.append(features)

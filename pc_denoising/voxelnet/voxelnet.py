@@ -2,7 +2,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch
 from torch.autograd import Variable
-from config import config as cfg
+from pc_denoising.voxelnet.config import config as cfg
 
 
 # conv2d + bn + relu
@@ -203,6 +203,6 @@ def voxel_indexing(sparse_features, coords):
 
     dense_feature[
         :, coords[:, 0], coords[:, 1], coords[:, 2], coords[:, 3]
-    ] = sparse_features
+    ] = sparse_features.T
 
     return dense_feature.transpose(0, 1)

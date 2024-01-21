@@ -1,4 +1,3 @@
-import random
 from pathlib import Path
 from typing import Sequence, Tuple
 
@@ -54,9 +53,12 @@ class KITTI(Dataset):
         for idx, point_count in enumerate(point_counts):
             points_in_voxel = lidar[voxel_indices == idx]
             num_sampled_points = min(self._num_points_per_voxel, point_count)
-            sampled_points[idx, :num_sampled_points] = random.sample(
-                points_in_voxel.tolist(), num_sampled_points
+            sampled_indices = np.random.choice(
+                point_count, num_sampled_points, replace=False
             )
+            sampled_points[idx, :num_sampled_points, :] = points_in_voxel[
+                sampled_indices
+            ]
         return sampled_points
 
 

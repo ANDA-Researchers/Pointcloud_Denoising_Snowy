@@ -13,17 +13,16 @@ from pc_denoising.voxel_net.data_aug import aug_data
 
 
 class KittiDataset(data.Dataset):
-    def __init__(
-        self, lidar_path, image_path, calib_path, label_path, type="velodyne_train"
-    ):
+    def __init__(self, root, file_list, type="velodyne_train") -> None:
         self.type = type
-        self.lidar_path = lidar_path
-        self.image_path = image_path
-        self.calib_path = calib_path
-        self.label_path = label_path
+        self.root = root
+        self.data_path = os.path.join(root, "training")
+        self.lidar_path = os.path.join(self.data_path, "crop/")
+        self.image_path = os.path.join(self.data_path, "image_2/")
+        self.calib_path = os.path.join(self.data_path, "calib/")
+        self.label_path = os.path.join(self.data_path, "label_2/")
 
-        with open(os.path.join(self.data_path, "%s.txt" % set)) as f:
-            self.file_list = f.read().splitlines()
+        self.file_list = file_list
 
         self.T = cfg.T
         self.vd = cfg.vd
@@ -81,9 +80,13 @@ class KittiDataset(data.Dataset):
 
         image = cv2.imread(image_file)
 
-        # data augmentation
         if self.type == "velodyne_train":
+            # data augmentation
             lidar, gt_box3d = aug_data(lidar, gt_box3d)
+        elif self.type == "velodyne_test":
+            pass
+        else:
+            raise ValueError("the type invalid")
 
         # specify a range
         lidar, gt_box3d = utils.get_filtered_lidar(lidar, gt_box3d)

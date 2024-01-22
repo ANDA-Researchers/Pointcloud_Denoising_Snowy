@@ -10,6 +10,5 @@ setup(
         "numpy==1.24.4",
         "matplotlib==3.7.2",
         "opencv-python==4.9.0.80",
-        "mayavi==4.8.1",
     ],
 )

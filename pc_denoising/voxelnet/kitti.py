@@ -43,7 +43,7 @@ class KittiDataset(data.Dataset):
         voxel_coords = (
             (lidar[:, :3] - np.array([self.xrange[0], self.yrange[0], self.zrange[0]]))
             / (self.vw, self.vh, self.vd)
-        ).astype(np.int64)
+        ).astype(np.int32)
 
         # convert to  (D, H, W)
         voxel_coords = voxel_coords[:, [2, 1, 0]]

@@ -1,3 +1,4 @@
+import torch
 import numpy as np
 
 
@@ -13,7 +14,7 @@ def segmentation_collate(batch):
         voxel_features.append(sample[1])
         voxel_labels.append(sample[2])
     return (
-        np.concatenate(voxel_coords),
-        np.concatenate(voxel_features),
-        np.concatenate(voxel_labels),
+        torch.from_numpy(np.concatenate(voxel_coords)),
+        torch.from_numpy(np.concatenate(voxel_features)),
+        torch.from_numpy(np.concatenate(voxel_labels)),
     )

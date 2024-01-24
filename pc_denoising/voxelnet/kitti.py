@@ -76,6 +76,8 @@ class KittiDataset(data.Dataset):
 
         calib = utils.load_kitti_calib(calib_file)
         lidar = np.fromfile(lidar_file, dtype=np.float32).reshape(-1, 5)
+        labels = lidar[:, 4]
+        lidar = lidar[labels != 0]
 
         if self.type == "velodyne_train":
             label_file = self.label_files[i]

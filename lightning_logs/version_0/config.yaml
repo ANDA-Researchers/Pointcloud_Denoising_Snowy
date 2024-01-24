@@ -3,7 +3,22 @@ seed_everything: true
 trainer:
   logger: true
   enable_checkpointing: true
-  callbacks: null
+  callbacks:
+    class_path: pytorch_lightning.callbacks.ModelCheckpoint
+    init_args:
+      dirpath: null
+      filename: null
+      monitor: val_iou
+      verbose: false
+      save_last: null
+      save_top_k: 1
+      save_weights_only: false
+      mode: max
+      auto_insert_metric_name: true
+      every_n_train_steps: null
+      train_time_interval: null
+      every_n_epochs: null
+      save_on_train_epoch_end: null
   default_root_dir: null
   gradient_clip_val: null
   gradient_clip_algorithm: null
@@ -29,7 +44,7 @@ trainer:
   limit_val_batches: null
   limit_test_batches: null
   limit_predict_batches: null
-  val_check_interval: null
+  val_check_interval: 0.1
   log_every_n_steps: 50
   accelerator: null
   strategy: null
@@ -64,3 +79,9 @@ optimizer:
     dampening: 0.0
     weight_decay: 0.0
     nesterov: false
+lr_scheduler:
+  class_path: torch.optim.lr_scheduler.ExponentialLR
+  init_args:
+    gamma: 0.9
+    last_epoch: -1
+    verbose: false

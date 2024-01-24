@@ -27,7 +27,7 @@ def get_filtered_lidar(lidar, boxes3d=None):
 
         return lidar[filter_xyz], boxes3d[box_xyz > 0]
 
-    return lidar[filter_xyz]
+    return lidar[filter_xyz], boxes3d
 
 
 def lidar_to_bev(lidar):

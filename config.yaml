@@ -1,5 +1,11 @@
 trainer:
   max_epochs: 100
+  val_check_interval: 0.1
+  callbacks:
+    class_path: pytorch_lightning.callbacks.ModelCheckpoint
+    init_args:
+      monitor: val_iou
+      mode: max
 data:
   root: KITTISnow
   snow_rate: light

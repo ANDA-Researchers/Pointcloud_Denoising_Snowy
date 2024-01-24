@@ -65,7 +65,7 @@ class KittiDataset(data.Dataset):
             features[: pts.shape[0], :] = np.concatenate(
                 (pts[:, :4], pts[:, :3] - np.mean(pts[:, :3], 0)), axis=1
             )
-            labels[: pts.shape[0]] = pts[:, 4]
+            labels[: pts.shape[0]] = (pts[:, 4] == 1).astype(np.int64)
             voxel_features.append(features)
             voxel_labels.append(labels)
         return voxel_coords, np.array(voxel_features), np.array(voxel_labels)

@@ -1,0 +1,13 @@
+trainer:
+  max_epochs: 100
+data:
+  root: KITTISnow
+  snow_rate: light
+optimizer:
+  class_path: torch.optim.SGD
+  init_args:
+    lr: 0.1
+lr_scheduler:
+  class_path: torch.optim.lr_scheduler.ExponentialLR
+  init_args:
+    gamma: 0.9

@@ -33,11 +33,6 @@ import MinkowskiEngine as ME
 from MinkowskiEngine.modules.resnet_block import BasicBlock, Bottleneck
 
 
-if not os.path.isfile("1.ply"):
-    print("Downloading an example pointcloud...")
-    urlretrieve("https://bit.ly/3c2iLhg", "1.ply")
-
-
 class ResNetBase(nn.Module):
     BLOCK = None
     LAYERS = ()

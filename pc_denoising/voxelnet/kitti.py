@@ -13,13 +13,12 @@ class KittiDataset(data.Dataset):
         self,
         lidar_files,
         calib_files,
-        label_files,
+        label_files=None,
         type="velodyne_train",
     ) -> None:
         self.lidar_files = lidar_files
         self.calib_files = calib_files
-        if type == "velodyne_train":
-            self.label_files = label_files
+        self.label_files = label_files
 
         self.type = type
 
@@ -78,6 +77,8 @@ class KittiDataset(data.Dataset):
         lidar = np.fromfile(lidar_file, dtype=np.float32).reshape(-1, 5)
         labels = lidar[:, 4]
         lidar = lidar[labels != 0]
+
+        gt_box3d = None
 
         if self.type == "velodyne_train":
             label_file = self.label_files[i]

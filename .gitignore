@@ -6,3 +6,6 @@ __pycache__/
 
 # Dataset
 KITTISnow/
+
+# Logs
+lightning_logs/

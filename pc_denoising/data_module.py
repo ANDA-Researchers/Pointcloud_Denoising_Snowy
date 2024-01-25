@@ -55,7 +55,6 @@ class KITTI(pl.LightningDataModule):
         return DataLoader(
             self._val_ds,
             cfg.N,
-            shuffle=True,
             collate_fn=segmentation_collate,
             num_workers=cpu_count(),
         )

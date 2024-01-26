@@ -4,6 +4,7 @@ import math
 
 import cv2
 import numpy as np
+import torch
 
 from pc_denoising.voxelnet.config import config as cfg
 
@@ -460,6 +461,25 @@ def load_kitti_label(label_file, Tr):
     gt_boxes3d_corner = np.array(gt_boxes3d_corner).reshape(-1, 8, 3)
 
     return gt_boxes3d_corner
+
+
+def segmentation_collate(batch):
+    voxel_coords = []
+    voxel_features = []
+    voxel_labels = []
+
+    for i, sample in enumerate(batch):
+        voxel_coords.append(
+            np.pad(sample[0], ((0, 0), (1, 0)), mode="constant", constant_values=i)
+        )
+        voxel_features.append(sample[1])
+        voxel_labels.append(sample[2])
+    return (
+        torch.from_numpy(np.concatenate(voxel_coords)),
+        torch.from_numpy(np.concatenate(voxel_features)),
+        torch.from_numpy(np.concatenate(voxel_labels)),
+    )
+
 
 
 def test():

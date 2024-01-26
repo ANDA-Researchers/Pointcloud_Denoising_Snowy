@@ -6,13 +6,13 @@ from torchmetrics.classification import BinaryJaccardIndex
 import pytorch_lightning as pl
 
 from pc_denoising.models.minkunet import MinkUNet34C
-from pc_denoising.models.voxelnet import voxelnet
+from pc_denoising.models.voxelnet import SVFE
 
 
 class MinkowskiUNet(pl.LightningModule):
     def __init__(self) -> None:
         super().__init__()
-        self.svfe = voxelnet.SVFE()
+        self.svfe = SVFE()
         self.unet = MinkUNet34C(in_channels=128, out_channels=35)
         self.loss = torch.nn.BCEWithLogitsLoss()
         self.train_iou = BinaryJaccardIndex()

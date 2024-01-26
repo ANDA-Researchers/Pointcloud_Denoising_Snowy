@@ -3,8 +3,12 @@ from setuptools import setup
 
 setup(
     name="pc_denoising",
-    version="0.0.1",
     packages=["pc_denoising"],
+    entry_points={
+        "console_scripts": [
+            "unet = pc_denoising.main:cli_main",
+        ],
+    },
     install_requires=[
         "ipykernel==6.29.0",
         "ipywidgets==8.1.1",

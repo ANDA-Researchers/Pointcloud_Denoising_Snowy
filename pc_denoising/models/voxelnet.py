@@ -1,8 +1,9 @@
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import torch
 from torch.autograd import Variable
-from pc_denoising.voxelnet.config import config as cfg
+
+from pc_denoising.config import config as cfg
 
 
 # conv2d + bn + relu

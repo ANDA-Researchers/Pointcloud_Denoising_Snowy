@@ -5,8 +5,8 @@ import torch
 from torchmetrics.classification import BinaryJaccardIndex
 import pytorch_lightning as pl
 
-from pc_denoising.minkunet.minkunet import MinkUNet34C
-from pc_denoising.voxelnet.voxelnet import voxelnet
+from pc_denoising.models.minkunet import MinkUNet34C
+from pc_denoising.models.voxelnet import voxelnet
 
 
 class MinkowskiUNet(pl.LightningModule):

@@ -21,15 +21,10 @@
 # Please cite "4D Spatio-Temporal ConvNets: Minkowski Convolutional Neural
 # Networks", CVPR'19 (https://arxiv.org/abs/1904.08755) if you use any part
 # of the code.
-import torch
-import torch.nn as nn
-from torch.optim import SGD
-
 import MinkowskiEngine as ME
-
 from MinkowskiEngine.modules.resnet_block import BasicBlock, Bottleneck
 
-from pc_denoising.resnet import ResNetBase
+from pc_denoising.models.resnet import ResNetBase
 
 
 class MinkUNetBase(ResNetBase):

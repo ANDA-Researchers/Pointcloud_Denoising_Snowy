@@ -16,7 +16,7 @@ setup(
         "matplotlib==3.7.2",
         "numpy==1.24.4",
         "opencv-python==4.9.0.80",
-        "scikit-learn==1.10.1",
+        "scikit-learn==1.3.2",
         "tqdm==4.66.1",
     ],
 )

@@ -1,19 +1,7 @@
 import cv2
 import numpy as np
 
-from pc_denoising.voxelnet.config import config as cfg
-
-
-def draw_polygon(img, box_corner, color=(255, 255, 255), thickness=1):
-    tup0 = (box_corner[0, 1], box_corner[0, 0])
-    tup1 = (box_corner[1, 1], box_corner[1, 0])
-    tup2 = (box_corner[2, 1], box_corner[2, 0])
-    tup3 = (box_corner[3, 1], box_corner[3, 0])
-    cv2.line(img, tup0, tup1, color, thickness, cv2.LINE_AA)
-    cv2.line(img, tup1, tup2, color, thickness, cv2.LINE_AA)
-    cv2.line(img, tup2, tup3, color, thickness, cv2.LINE_AA)
-    cv2.line(img, tup3, tup0, color, thickness, cv2.LINE_AA)
-    return img
+from pc_denoising.config import config as cfg
 
 
 def point_transform(points, tx, ty, tz, rx=0, ry=0, rz=0):

@@ -6,9 +6,9 @@ from typing import Any, Mapping, Sequence
 import pytorch_lightning as pl
 from torch.utils.data import DataLoader
 
-from pc_denoising.voxelnet.config import config as cfg
-from pc_denoising.voxelnet.kitti import KittiDataset
-from pc_denoising.voxelnet.train import segmentation_collate
+from pc_denoising.config import config as cfg
+from pc_denoising.data.dataset import KittiDataset
+from pc_denoising.data.utils import segmentation_collate
 
 
 class KITTI(pl.LightningDataModule):

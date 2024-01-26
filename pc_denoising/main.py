@@ -1,6 +1,6 @@
 from pytorch_lightning.cli import LightningCLI
 
-from pc_denoising.data_module import KITTI
+from pc_denoising.data import KITTI
 from pc_denoising.model import MinkowskiUNet
 
 

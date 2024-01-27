@@ -19,7 +19,7 @@ class config:
 
     # points cloud range
     # xrange = (0, 70.4)  # Original
-    xrange = (0, 9.9244)  # Light snow
+    xrange = (0, 80)  # Light snow
     yrange = (-50, 50)
     zrange = (-5, 3)
 

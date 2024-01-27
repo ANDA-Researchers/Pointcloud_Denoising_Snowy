@@ -10,7 +10,7 @@ class config:
     N = 2
 
     # maxiumum number of points per voxel
-    T = 100
+    T = 35
 
     # voxel size
     vd = 0.01  # 0.4 (pre-cropped)

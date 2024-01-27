@@ -52,3 +52,11 @@ class DenseDenoiser(pl.LightningModule):
         loss = self.loss(outputs.F, voxel_labels.float())
         self.test_iou(outputs.F, voxel_labels)
         self.log_dict({"test_loss": loss, "test_iou": self.test_iou}, prog_bar=True)
+
+    def predict_step(
+        self, batch: Any, batch_idx: int, dataloader_idx: int = 0
+    ) -> torch.FloatTensor:
+        (voxel_coords, voxel_features, voxel_labels), *_ = batch
+        vwfs = self.svfe(voxel_features)
+        inputs = ME.SparseTensor(vwfs, voxel_coords)
+        return self.unet(inputs).F

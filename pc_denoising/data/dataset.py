@@ -26,9 +26,9 @@ class KittiDataset(data.Dataset):
         self.vd = cfg.vd
         self.vh = cfg.vh
         self.vw = cfg.vw
-        self.xrange = cfg.xrange
-        self.yrange = cfg.yrange
-        self.zrange = cfg.zrange
+        self.xrange = list(cfg.xrange)
+        self.yrange = list(cfg.yrange)
+        self.zrange = list(cfg.zrange)
         self.anchors = cfg.anchors.reshape(-1, 7)
         self.feature_map_shape = (int(cfg.H / 2), int(cfg.W / 2))
         self.anchors_per_position = cfg.anchors_per_position
@@ -72,6 +72,13 @@ class KittiDataset(data.Dataset):
     def __getitem__(self, i):
         lidar_file = self.lidar_files[i]
         calib_file = self.calib_files[i]
+
+        if "light" in lidar_file:
+            self.xrange[1] = 9.9244
+        elif "medium" in lidar_file:
+            self.xrange[1] = 8.9321
+        else:
+            self.xrange[1] = 8.8797
 
         calib = utils.load_kitti_calib(calib_file)
         lidar = np.fromfile(lidar_file, dtype=np.float32).reshape(-1, 5)

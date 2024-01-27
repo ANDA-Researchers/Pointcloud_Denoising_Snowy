@@ -87,7 +87,7 @@ class KITTI(pl.LightningDataModule):
         calib_files = [
             os.path.join(self._root, stage, "calib", f"{file}.txt") for file in id_list
         ]
-        if stage == "traning":
+        if stage == "training":
             label_files = [
                 os.path.join(self._root, "training", "label_2", f"{file}.txt")
                 for file in id_list

@@ -10,16 +10,15 @@ class config:
     N = 2
 
     # maxiumum number of points per voxel
-    T = 35
+    T = 100
 
     # voxel size
-    vd = 0.02  # 0.4 (pre-cropped)
+    vd = 0.01  # 0.4 (pre-cropped)
     vh = 0.2
     vw = 0.2
 
     # points cloud range
-    # xrange = (0, 70.4)  # Original
-    xrange = (0, 80)  # Light snow
+    xrange = (0, 70.4)
     yrange = (-50, 50)
     zrange = (-5, 3)
 

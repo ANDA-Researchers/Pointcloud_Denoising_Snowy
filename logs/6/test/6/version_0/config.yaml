@@ -88,7 +88,7 @@ trainer:
 data:
   root: KITTISnow
   subset: 6
-ckpt_path: lightning_logs/version_6/checkpoints/epoch=85-step=158315.ckpt
+ckpt_path: logs/6/fit/version_0/checkpoints/epoch=85-step=158315.ckpt
 verbose: true
 optimizer:
   class_path: torch.optim.Adam

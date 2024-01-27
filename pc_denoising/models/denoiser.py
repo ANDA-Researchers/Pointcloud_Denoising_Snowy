@@ -9,7 +9,7 @@ from pc_denoising.models.minkunet import MinkUNet34C
 from pc_denoising.models.voxelnet import SVFE
 
 
-class MinkowskiUNet(pl.LightningModule):
+class DenseDenoiser(pl.LightningModule):
     def __init__(self) -> None:
         super().__init__()
         self.svfe = SVFE()

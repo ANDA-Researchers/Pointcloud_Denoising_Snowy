@@ -1,11 +1,11 @@
 from pytorch_lightning.cli import LightningCLI
 
 from pc_denoising.data import KITTI
-from pc_denoising.models import MinkowskiUNet
+from pc_denoising.models import DenseDenoiser
 
 
 def cli_main():
-    cli = LightningCLI(MinkowskiUNet, KITTI)
+    cli = LightningCLI(DenseDenoiser, KITTI)
 
 
 if __name__ == "__main__":

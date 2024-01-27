@@ -6,7 +6,7 @@ setup(
     packages=["pc_denoising"],
     entry_points={
         "console_scripts": [
-            "unet = pc_denoising.main:cli_main",
+            "denoiser = pc_denoising.main:cli_main",
         ],
     },
     install_requires=[

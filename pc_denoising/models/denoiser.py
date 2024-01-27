@@ -7,7 +7,6 @@ import pytorch_lightning as pl
 
 from pc_denoising.models.minkunet import MinkUNet34C
 from pc_denoising.models.voxelnet import SVFE
-from random import sample
 
 
 class DenseDenoiser(pl.LightningModule):

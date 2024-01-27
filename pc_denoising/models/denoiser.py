@@ -7,6 +7,7 @@ import pytorch_lightning as pl
 
 from pc_denoising.models.minkunet import MinkUNet34C
 from pc_denoising.models.voxelnet import SVFE
+from random import sample
 
 
 class DenseDenoiser(pl.LightningModule):
@@ -56,7 +57,7 @@ class DenseDenoiser(pl.LightningModule):
     def predict_step(
         self, batch: Any, batch_idx: int, dataloader_idx: int = 0
     ) -> torch.FloatTensor:
-        (voxel_coords, voxel_features, voxel_labels), *_ = batch
+        voxel_coords, voxel_features, voxel_labels = batch
         vwfs = self.svfe(voxel_features)
         inputs = ME.SparseTensor(vwfs, voxel_coords)
         return self.unet(inputs).F

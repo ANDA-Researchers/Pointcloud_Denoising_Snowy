@@ -1,4 +1,3 @@
-import itertools
 import os
 import pickle
 from multiprocessing import cpu_count
@@ -24,18 +23,30 @@ class KITTI(pl.LightningDataModule):
         3: ("medium", "heavy"),
     }
 
-    def __init__(self, root: str, subset: str) -> None:
+    def __init__(self, root: str, subset: int) -> None:
         super().__init__()
         self._root = root
         self._subset = subset
 
     def setup(self, stage: str) -> None:
         if stage == "fit":
-            self._train_ds = self._get_train_ds()
-        if stage in {"evaluate", "predict"}:
-            self._test_ds = self._get_test_ds()
+            with open(
+                os.path.join(self._root, "kitti_infos_train.pkl"), "rb"
+            ) as info_ref:
+                infos = pickle.load(info_ref)
+            self._train_ds = self._get_ds(infos, "training")
+        if stage in {"test", "predict"}:
+            with open(
+                os.path.join(self._root, "kitti_infos_test.pkl"), "rb"
+            ) as info_ref:
+                infos = pickle.load(info_ref)
+            self._test_ds = self._get_ds(infos, "testing", "velodyne_test")
         if stage in {"fit", "validate"}:
-            self._val_ds = self._get_val_ds()
+            with open(
+                os.path.join(self._root, "kitti_infos_val.pkl"), "rb"
+            ) as info_ref:
+                infos = pickle.load(info_ref)
+            self._val_ds = self._get_ds(infos, "training", "velodyne_test")
 
     def train_dataloader(self) -> DataLoader:
         return DataLoader(
@@ -65,93 +76,62 @@ class KITTI(pl.LightningDataModule):
     def predict_dataloader(self) -> DataLoader:
         return self.test_dataloader()
 
-    def _get_train_ds(self) -> KittiDataset:
-        with open(os.path.join(self._root, "kitti_infos_train.pkl"), "rb") as info_ref:
-            infos = pickle.load(info_ref)
+    def _get_ds(
+        self,
+        infos: Sequence[Mapping[str, Any]],
+        stage: str,
+        type_: str = "velodyne_train",
+    ) -> KittiDataset:
         id_list = self._get_id_list(infos)
-        lidar_files = self._get_fit_lidar_files(self._subset, id_list)
+        lidar_files = self._dispatch_lidar_files(stage, id_list)
         calib_files = [
-            os.path.join(self._root, self._subset, "calib", f"{file}.txt")
-            for file in id_list
+            os.path.join(self._root, stage, "calib", f"{file}.txt") for file in id_list
         ]
-        label_files = [
-            os.path.join(self._root, self._subset, "label_2", f"{file}.txt")
-            for file in id_list
-        ]
-        return KittiDataset(lidar_files, calib_files, label_files, "velodyne_train")
-
-    def _get_test_ds(self) -> KittiDataset:
-        with open(os.path.join(self._root, "kitti_infos_test.pkl"), "rb") as info_ref:
-            infos = pickle.load(info_ref)
-        id_list = self._get_id_list(infos)
-        lidar_files = self._get_test_lidar_files(id_list)
-        calib_files = [
-            [
-                os.path.join(self._root, "testing", "calib", f"{file}.txt")
+        if stage == "traning":
+            label_files = [
+                os.path.join(self._root, "training", "label_2", f"{file}.txt")
                 for file in id_list
             ]
-            for _ in range(3)  # Replicate 3 times for light, medium and heavy
-        ]
-        calib_files = list(itertools.chain.from_iterable(calib_files))
-        return KittiDataset(lidar_files, calib_files, None, "velodyne_test")
-
-    def _get_val_ds(self) -> KittiDataset:
-        with open(os.path.join(self._root, "kitti_infos_val.pkl"), "rb") as info_ref:
-            infos = pickle.load(info_ref)
-        id_list = self._get_id_list(infos)
-        lidar_files = self._get_fit_lidar_files(self._subset, id_list)
-        calib_files = [
-            os.path.join(self._root, self._subset, "calib", f"{file}.txt")
-            for file in id_list
-        ]
-        return KittiDataset(lidar_files, calib_files, None, "velodyne_test")
+        else:
+            label_files = None
+        return KittiDataset(
+            lidar_files,
+            calib_files,
+            label_files,
+            type_,
+        )
 
     def _get_id_list(self, infos: Sequence[Mapping[str, Any]]) -> List[str]:
         return [info["velodyne_path"].split("/")[-1].split(".")[0] for info in infos]
 
-    def _get_fit_lidar_files(self, subset: int, id_list: Sequence[str]) -> List[str]:
-        if subset == 0:
-            return self._get_all_lidar_files(id_list)
-        elif 0 < subset < 4:
-            return self._get_mixed_lidar_files(subset, id_list)
-        else:
-            return self._get_lidar_files(subset, id_list)
+    def _dispatch_lidar_files(self, stage: str, id_list: Sequence[str]) -> List[str]:
+        if self._subset == 0:
+            return self._get_all_lidar_files(stage, id_list)
+        if 0 < self._subset < 4:
+            return self._get_mixed_lidar_files(stage, id_list)
+        return self._get_lidar_files(stage, id_list)
 
-    def _get_test_lidar_files(self, id_list: Sequence[str]):
-        lidar_file = os.path.join(
-            self._root,
-            "testing",
-            "velodyne_reduced",
-            "{subset}",
-            "{file}.bin",
-        )
-        lidar_files = []
-        lidar_files.extend([lidar_file.format("light", id_) for id_ in id_list])
-        lidar_files.extend([lidar_file.format("medium", id_) for id_ in id_list])
-        lidar_files.extend([lidar_file.format("heavy", id_) for id_ in id_list])
-        return lidar_files
-
-    def _get_lidar_files(self, subset: int, id_list: Sequence[str]) -> List[str]:
+    def _get_lidar_files(self, stage: str, id_list: Sequence[str]) -> List[str]:
         return [
             os.path.join(
                 self._root,
-                "training",
+                stage,
                 "velodyne_reduced",
-                self._subsets[subset],
+                self._subsets[self._subset],
                 f"{id_}.bin",
             )
             for id_ in id_list
         ]
 
-    def _get_mixed_lidar_files(self, subset: int, id_list: Sequence[str]):
-        subsets = self._mixed_subsets[subset]
+    def _get_mixed_lidar_files(self, stage: str, id_list: Sequence[str]):
+        subsets = self._mixed_subsets[self._subset]
         lidar_files = []
         lidar_file = os.path.join(
             self._root,
-            "training",
+            stage,
             "velodyne_reduced",
-            "{subset}",
-            "{file}.bin",
+            "{}",
+            "{}.bin",
         )
         for idx, id_ in enumerate(id_list):
             if idx % 2 == 0:
@@ -160,14 +140,14 @@ class KITTI(pl.LightningDataModule):
                 lidar_files.append(lidar_file.format(subsets[1], id_))
         return lidar_files
 
-    def _get_all_lidar_files(self, id_list: Sequence[str]):
+    def _get_all_lidar_files(self, stage: str, id_list: Sequence[str]):
         lidar_files = []
         lidar_file = os.path.join(
             self._root,
-            "training",
+            stage,
             "velodyne_reduced",
-            "{subset}",
-            "{file}",
+            "{}",
+            "{}.bin",
         )
         for idx, id_ in enumerate(id_list):
             if idx % 3 == 0:

@@ -69,7 +69,7 @@ trainer:
   inference_mode: true
 data:
   root: KITTISnow
-  snow_rate: medium
+  subset: 5
 ckpt_path: null
 optimizer:
   class_path: torch.optim.Adam

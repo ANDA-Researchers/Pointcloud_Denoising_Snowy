@@ -10,12 +10,12 @@ class config:
     N = 2
 
     # maxiumum number of points per voxel
-    T = 35
+    T = 100
 
     # voxel size
-    vd = 0.01  # 0.4 (pre-cropped)
-    vh = 0.2
-    vw = 0.2
+    vd = 0.05
+    vh = 0.05
+    vw = 0.05
 
     # points cloud range
     xrange = (0, 70.4)

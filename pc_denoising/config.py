@@ -13,15 +13,15 @@ class config:
     T = 35
 
     # voxel size
-    vd = 0.2  # 0.4 (pre-cropped)
+    vd = 0.02  # 0.4 (pre-cropped)
     vh = 0.2
     vw = 0.2
 
     # points cloud range
     # xrange = (0, 70.4)  # Original
     xrange = (0, 9.9244)  # Light snow
-    yrange = (-40, 40)
-    zrange = (-3, 1)
+    yrange = (-50, 50)
+    zrange = (-5, 3)
 
     # voxel grid
     W = math.ceil((xrange[1] - xrange[0]) / vw)

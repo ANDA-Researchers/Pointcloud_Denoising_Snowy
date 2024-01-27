@@ -29,5 +29,5 @@ pip install -e .
 ## Usage
 Example of training the U-Net noise segmentation model
 ```
-unet fit --config=lightning_logs/version_0/config.yaml
+unet fit --config=logs/0/fit/version_0/config.yaml
 ```

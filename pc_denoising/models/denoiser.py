@@ -26,7 +26,7 @@ class DenseDenoiser(pl.LightningModule):
 
         loss = self.loss(outputs.F, voxel_labels.float())
         self.iou(outputs.F, voxel_labels)
-        self.log_dict({"iou": self.iou}, prog_bar=True)
+        self.log_dict({"train_loss": loss, "train_iou": self.iou}, prog_bar=True)
         return loss
 
     def validation_step(self, *args: Any, **kwargs: Any) -> None:

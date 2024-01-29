@@ -15,7 +15,9 @@ class DenseDenoiser(pl.LightningModule):
         self.svfe = SVFE()
         self.unet = MinkUNet34C(in_channels=128, out_channels=35)
         self.loss = torch.nn.BCEWithLogitsLoss()
-        self.iou = BinaryJaccardIndex()
+        self.train_iou = BinaryJaccardIndex()
+        self.test_iou = BinaryJaccardIndex()
+        self.val_iou = BinaryJaccardIndex()
 
     def training_step(self, *args: Any, **kwargs: Any) -> torch.FloatTensor:
         (voxel_coords, voxel_features, voxel_labels), *_ = args
@@ -25,8 +27,8 @@ class DenseDenoiser(pl.LightningModule):
         outputs = self.unet(inputs)
 
         loss = self.loss(outputs.F, voxel_labels.float())
-        self.iou(outputs.F, voxel_labels)
-        self.log_dict({"train_loss": loss, "train_iou": self.iou}, prog_bar=True)
+        self.train_iou(outputs.F, voxel_labels)
+        self.log_dict({"train_loss": loss, "train_iou": self.train_iou}, prog_bar=True)
         return loss
 
     def validation_step(self, *args: Any, **kwargs: Any) -> None:
@@ -37,8 +39,8 @@ class DenseDenoiser(pl.LightningModule):
         outputs = self.unet(inputs)
 
         loss = self.loss(outputs.F, voxel_labels.float())
-        self.iou(outputs.F, voxel_labels)
-        self.log_dict({"val_loss": loss, "val_iou": self.iou}, prog_bar=True)
+        self.val_iou(outputs.F, voxel_labels)
+        self.log_dict({"val_loss": loss, "val_iou": self.val_iou}, prog_bar=True)
 
     def test_step(self, *args: Any, **kwargs: Any) -> None:
         (voxel_coords, voxel_features, voxel_labels), *_ = args
@@ -48,8 +50,8 @@ class DenseDenoiser(pl.LightningModule):
         outputs = self.unet(inputs)
 
         loss = self.loss(outputs.F, voxel_labels.float())
-        self.iou(outputs.F, voxel_labels)
-        self.log_dict({"test_loss": loss, "test_iou": self.iou})
+        self.test_iou(outputs.F, voxel_labels)
+        self.log_dict({"test_loss": loss, "test_iou": self.test_iou})
 
     def predict_step(
         self, batch: Any, batch_idx: int, dataloader_idx: int = 0

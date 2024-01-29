@@ -149,4 +149,5 @@ def load_h5_data( num_center=50 ,num_point = 20000,h5_filename='./test3.h5'):
 
 if __name__ == '__main__':
     main()
+    load_h5_data()
 
